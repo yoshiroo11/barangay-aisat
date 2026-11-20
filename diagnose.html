@@ -21,6 +21,14 @@ code { background: #e2e8f0; padding: 1px 4px; border-radius: 4px; }
 
 <script src="firebase-config.js"></script>
 <script>
+window.addEventListener("error", function (e) {
+    if (e.filename && e.filename.indexOf("backend.js") !== -1) {
+        window.__backendError = e.message + " (line " + e.lineno + ")";
+    }
+});
+</script>
+<script src="backend.js"></script>
+<script>
 const out = document.getElementById("out");
 
 function add(cls, text) {
@@ -113,6 +121,39 @@ function withTimeout(promise, ms, label) {
             hint = " -> The Firestore database does not exist yet. Create it in Firebase > Firestore Database.";
         }
         wait.textContent = "6. FAILED. code = " + (code || "none") + ", message = " + e.message + hint;
+    }
+
+    // ---- Test the real backend.js the way the emergency page uses it ----
+    if (window.__backendError) {
+        add("bad", "7. backend.js has an error: " + window.__backendError + " -> the backend.js on GitHub is broken. Re-upload it.");
+        return;
+    }
+    if (!window.Backend) {
+        add("bad", "7. backend.js did not load or is broken (Backend is missing). Open /barangay-aisat/backend.js in your browser: it must show the code starting with (function () { and be 209 lines long. Re-upload it.");
+        return;
+    }
+    add("ok", "7. backend.js loaded. mode = " + window.Backend.mode);
+
+    const w8 = add("wait", "8. Sending a TEST report through backend.js (with GPS link)...");
+    try {
+        const r = await window.Backend.submitReport({
+            type: "FIRE",
+            label: "FIRE ALARM",
+            person: "DIAGNOSE TEST 2",
+            phone: "0000000",
+            place: "Test only - delete me",
+            channel: "TEST",
+            map: "https://www.google.com/maps?q=14.599512,120.984222"
+        });
+        w8.className = "step " + (r.queued ? "bad" : "ok");
+        w8.textContent = r.queued
+            ? "8. Not confirmed after 15s (queued). Connection to Firestore is slow or blocked."
+            : "8. Report with GPS link saved through backend.js. id = " + r.id + ". Emergency page should work now.";
+    } catch (e) {
+        w8.className = "step bad";
+        const code = e && e.code;
+        w8.textContent = "8. FAILED through backend.js. code = " + (code || "none") + ", message = " + e.message +
+            (code === "permission-denied" ? " -> The rules reject something in the report (probably the map link format)." : "");
     }
 })();
 </script>
