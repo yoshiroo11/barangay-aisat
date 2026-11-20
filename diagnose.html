@@ -75,9 +75,9 @@ function withTimeout(promise, ms, label) {
 
     let app, auth, db;
     try {
-        app = appMod.initializeApp(cfg);
+        app = appMod.initializeApp(cfg, "diag");
         auth = authMod.getAuth(app);
-        db = fsMod.getFirestore(app);
+        db = fsMod.initializeFirestore(app, { experimentalForceLongPolling: true });
         add("ok", "4. Firebase started.");
     } catch (e) {
         add("bad", "4. Firebase could not start: " + e.message);
