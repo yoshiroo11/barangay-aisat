@@ -23,7 +23,8 @@
           import(SDK + "firebase-firestore.js")
         ]);
         const a = app.initializeApp(cfg);
-        return { auth: auth.getAuth(a), db: fs.getFirestore(a), A: auth, F: fs };
+        const db = fs.initializeFirestore(a, { experimentalForceLongPolling: true });
+        return { auth: auth.getAuth(a), db: db, A: auth, F: fs };
       })();
       loading.catch(() => { loading = null; });
     }
