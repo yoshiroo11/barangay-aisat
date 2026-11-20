@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barangay Aisat Emergency Report</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: #edf2f7;
+    color: #172033;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background: #126b43;
+    color: white;
+    text-align: center;
+    padding: 22px 12px;
+}
+header h1 { font-size: 23px; margin: 8px 0; }
+header p { font-size: 13px; margin: 0; }
+header .back {
+    display: inline-block;
+    color: white;
+    font-size: 13px;
+    text-decoration: none;
+    border: 1px solid #ffffff80;
+    border-radius: 999px;
+    padding: 5px 14px;
+}
+header .back:hover { background: #ffffff25; }
+
+main { max-width: 650px; margin: auto; padding: 14px; }
+
+.banner {
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.card {
+    background: #dff5e6;
+    padding: 18px;
+    border-radius: 14px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+h2 { font-size: 18px; margin-top: 0; }
+
+.screen {
+    background: #126b43;
+    color: white;
+    border-radius: 12px;
+    padding: 17px;
+    margin-bottom: 16px;
+}
+.screen p { margin: 10px 0 0; }
+.status {
+    color: #86efac;
+    font-weight: bold;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+button {
+    border: 0;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 3px 0;
+}
+button:disabled { opacity: 0.6; cursor: wait; }
+
+.emergency {
+    min-height: 140px;
+    color: white;
+    border: 5px solid #ffffff40;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.emergency span { display: block; font-size: 43px; margin-bottom: 10px; }
+.fire { background: #dc2626; }
+.riot { background: #155eef; }
+.sexual { background: #dc2626; }
+.others { background: #126b43; }
+
+.blue { background: #1d4ed8; color: white; }
+.green { background: #15803d; color: white; }
+.gray { background: #e2e8f0; color: #172033; }
+.full { width: 100%; }
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    margin: 7px 0 13px;
+    font-size: 15px;
+    background: white;
+}
+label { font-size: 13px; font-weight: bold; }
+
+.info {
+    padding: 12px;
+    border-radius: 8px;
+    background: #eff6ff;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+footer {
+    text-align: center;
+    color: #64748b;
+    padding: 20px;
+    font-size: 12px;
+}
+
+@media (max-width: 360px) {
+    .buttons { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+<header>
+    <a class="back" href="index.html">← Barangay Aisat Website</a>
+    <h1>🚨 Emergency Report</h1>
+    <p>FIRE ALARM • RIOT ALERT • SEXUAL • OTHER REPORT • GPS • RADIO</p>
+</header>
+
+<main>
+
+<div id="modeBanner" class="banner" hidden>
+    DEMO MODE — Firebase is not set up yet. Reports stay on this device only.
+</div>
+
+<section class="card">
+    <h2>Send an Emergency Report</h2>
+
+    <div class="screen">
+        <div>ALL-IN-ONE EMERGENCY DEVICE</div>
+        <p id="clock">System Ready</p>
+        <div id="status" class="status" role="status"
+             aria-live="polite">● SYSTEM READY</div>
+    </div>
+
+    <div class="buttons">
+        <button class="emergency fire" onclick="sendAlert('FIRE')">
+            <span>🔥</span>
+            FIRE ALARM
+        </button>
+
+        <button class="emergency riot" onclick="sendAlert('RIOT')">
+            <span>🛡</span>
+            RIOT ALERT
+        </button>
+
+        <button class="emergency sexual" onclick="sendAlert('SEXUAL')">
+            <span>🙅</span>
+            SEXUAL
+        </button>
+
+        <button class="emergency others" onclick="sendAlert('OTHER')">
+            <span>⚙️</span>
+            OTHER REPORT
+        </button>
+    </div>
+
+    <p class="info" style="margin-top:14px">
+        Fill in your details below, then select the button that matches the
+        incident. Your report is sent to the Barangay Aisat response team.
+        If anyone is in immediate danger, also call 911.
+    </p>
+</section>
+
+<section class="card">
+    <h2>👤 Reporter Information</h2>
+
+    <label for="person">Name</label>
+    <input id="person" maxlength="100" placeholder="Name of person reporting">
+
+    <label for="phone">Contact Number</label>
+    <input id="phone" type="tel" maxlength="40" placeholder="Contact number">
+
+    <label for="place">Building / Incident Location</label>
+    <input id="place" maxlength="200" placeholder="Building, floor, room or area">
+
+    <button class="blue full" onclick="saveProfile()">
+        Save Reporter Information
+    </button>
+</section>
+
+<section class="card">
+    <h2>📍 GPS Location</h2>
+    <p id="gpsStatus">Location not retrieved.</p>
+
+    <button class="blue full" onclick="getLocation()">
+        Get Current Location
+    </button>
+
+    <button class="gray full" onclick="openMap()">
+        View Location on Map
+    </button>
+</section>
+
+<section class="card">
+    <h2>📻 Walkie-Talkie / Radio</h2>
+
+    <label for="channel">Radio Channel</label>
+    <input id="channel" maxlength="40" placeholder="Enter assigned channel">
+
+    <label for="message">Emergency Message</label>
+    <textarea id="message" rows="7"
+              placeholder="Emergency message appears here."
+              readonly></textarea>
+
+    <button class="green full" onclick="copyMessage()">
+        Copy Emergency Message
+    </button>
+
+    <button class="blue full" onclick="radioInstructions()">
+        Show Radio Instructions
+    </button>
+
+    <p id="radioStatus" class="info">
+        Radio is in manual relay mode. A compatible radio interface
+        is required for automatic transmission.
+    </p>
+</section>
+
+</main>
+
+<footer>
+    Emergency Response Prototype<br>
+    Use approved communication equipment and verified emergency procedures.
+</footer>
+
+<script src="firebase-config.js"></script>
+<script src="backend.js"></script>
+<script>
+let lat = null;
+let lon = null;
+let sending = false;
+
+const ALERT_TYPES = {
+    FIRE: {
+        label: "FIRE ALARM",
+        warning: "Confirm that a fire or smoke emergency is being reported.",
+        color: "#fca5a5"
+    },
+    RIOT: {
+        label: "RIOT ALERT",
+        warning: "Confirm that a riot or security emergency is being reported.",
+        color: "#93c5fd"
+    },
+    SEXUAL: {
+        label: "SEXUAL ALERT",
+        warning: "Confirm that a sexual harassment or abuse emergency is being reported.",
+        color: "#f9a8d4"
+    },
+    OTHER: {
+        label: "OTHER REPORT",
+        warning: "Confirm that another type of emergency is being reported.",
+        color: "#fde68a"
+    }
+};
+
+/* ---------- Clock ---------- */
+function updateClock() {
+    document.getElementById("clock").textContent =
+        new Date().toLocaleString();
+}
+
+updateClock();
+setInterval(updateClock, 1000);
+
+/* ---------- Reporter profile ---------- */
+function saveProfile() {
+    const profile = {
+        person: document.getElementById("person").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        place: document.getElementById("place").value.trim()
+    };
+
+    try {
+        localStorage.setItem("emergencyReporter", JSON.stringify(profile));
+        alert("Reporter information saved on this device.");
+    } catch (e) {
+        alert("This browser blocked saving on this device.");
+    }
+}
+
+function loadProfile() {
+    try {
+        const p = JSON.parse(localStorage.getItem("emergencyReporter"));
+        if (!p) return;
+
+        document.getElementById("person").value = p.person || "";
+        document.getElementById("phone").value = p.phone || "";
+        document.getElementById("place").value = p.place || "";
+    } catch (e) {}
+}
+
+/* ---------- GPS ---------- */
+function requestLocation(timeout) {
+    return new Promise(resolve => {
+        const output = document.getElementById("gpsStatus");
+
+        if (!navigator.geolocation) {
+            output.textContent = "GPS location is not supported.";
+            resolve(false);
+            return;
+        }
+
+        output.textContent = "Requesting location permission...";
+
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                lat = position.coords.latitude;
+                lon = position.coords.longitude;
+
+                output.textContent =
+                    "Latitude: " + lat.toFixed(6) +
+                    " | Longitude: " + lon.toFixed(6) +
+                    " | Accuracy: approximately " +
+                    Math.round(position.coords.accuracy) + " meters.";
+                resolve(true);
+            },
+            error => {
+                output.textContent =
+                    "Location unavailable. Check browser permissions and HTTPS.";
+                resolve(false);
+            },
+            { enableHighAccuracy: true, timeout: timeout }
+        );
+    });
+}
+
+function getLocation() {
+    requestLocation(15000);
+}
+
+function mapURL() {
+    if (lat === null || lon === null) return null;
+    return "https://www.google.com/maps?q=" + lat + "," + lon;
+}
+
+function openMap() {
+    const url = mapURL();
+    if (!url) {
+        alert("Get your GPS location first.");
+        return;
+    }
+
+    window.open(url, "_blank", "noopener,noreferrer");
+}
+
+/* ---------- Send a report ---------- */
+function setSending(flag) {
+    sending = flag;
+    document.querySelectorAll("button.emergency").forEach(b => { b.disabled = flag; });
+}
+
+async function sendAlert(type) {
+    const alertType = ALERT_TYPES[type];
+    if (!alertType || sending) return;
+
+    const label = alertType.label;
+
+    if (!confirm(alertType.warning + "\n\nSend this emergency report to the Barangay response team?")) return;
+
+    setSending(true);
+
+    const statusBox = document.getElementById("status");
+    statusBox.textContent = "● " + label + " — SENDING...";
+    statusBox.style.color = alertType.color;
+
+    // Include GPS in the report when possible.
+    if (lat === null) await requestLocation(6000);
+
+    const person =
+        document.getElementById("person").value.trim() || "Not provided";
+
+    const phone =
+        document.getElementById("phone").value.trim() || "Not provided";
+
+    const place =
+        document.getElementById("place").value.trim() || "Not provided";
+
+    const channel =
+        document.getElementById("channel").value.trim() || "Not assigned";
+
+    const map = mapURL();
+    const time = new Date().toLocaleString();
+
+    const text =
+        "EMERGENCY: " + label + "\n" +
+        "Reporter: " + person + "\n" +
+        "Contact: " + phone + "\n" +
+        "Incident area: " + place + "\n" +
+        "GPS: " + (map || "GPS unavailable") + "\n" +
+        "Radio channel: " + channel + "\n" +
+        "Time: " + time + "\n" +
+        "Action: Request appropriate emergency response.";
+
+    document.getElementById("message").value = text;
+
+    try {
+        const result = await Backend.submitReport({
+            type: type,
+            label: label,
+            person: person.slice(0, 100),
+            phone: phone.slice(0, 40),
+            place: place.slice(0, 200),
+            channel: channel.slice(0, 40),
+            map: map
+        });
+
+        if (result.queued) {
+            statusBox.textContent = "● " + label + " — NOT YET CONFIRMED";
+            alert(label + " is still being sent.\n\nKeep this page open. " +
+                  "If it does not go through, relay the message by radio or call 911.");
+        } else {
+            statusBox.textContent = "● " + label + " — REPORT SENT";
+            alert(label + " report sent to the Barangay response team.\n\n" +
+                  "If anyone is in immediate danger, also call 911.");
+        }
+    } catch (e) {
+        statusBox.textContent = "● " + label + " — SEND FAILED";
+        statusBox.style.color = "#fecaca";
+
+        const reason = e && e.code === "permission-denied"
+            ? "The system is not set up to accept reports yet."
+            : "Check your internet connection and try again.";
+
+        alert(label + " could NOT be sent.\n\n" + reason + "\n\n" +
+              "The message is ready below. Relay it by radio, or call 911.");
+    } finally {
+        setSending(false);
+    }
+}
+
+/* ---------- Message / radio ---------- */
+async function copyMessage() {
+    const field = document.getElementById("message");
+
+    if (!field.value.trim()) {
+        alert("Press FIRE ALARM, RIOT ALERT, SEXUAL, OTHER REPORT first.");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(field.value);
+        alert("Message copied. Relay it using your authorized radio.");
+    } catch (e) {
+        field.focus();
+        field.select();
+        alert("Select and copy the message manually.");
+    }
+}
+
+function radioInstructions() {
+    document.getElementById("radioStatus").textContent =
+        "MANUAL RADIO RELAY: Use your assigned, authorized channel. " +
+        "Press and hold the physical PTT button, identify your station, " +
+        "state the type of emergency (FIRE, RIOT, SEXUAL or OTHER), " +
+        "provide the incident area and coordinates " +
+        "if available, and request confirmation from the receiving team. " +
+        "Release PTT after speaking. This webpage does not transmit radio.";
+}
+
+/* ---------- Start ---------- */
+loadProfile();
+if (Backend.mode === "demo") document.getElementById("modeBanner").hidden = false;
+</script>
+</body>
+</html>
