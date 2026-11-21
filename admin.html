@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Emergency Dashboard — Barangay Aisat</title>
+<title>Emergency Dashboard — Rosario (Student Concept)</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -17,7 +17,7 @@ body {
 }
 
 header {
-    background: #094b30;
+    background: #172554;
     color: white;
     text-align: center;
     padding: 20px 12px;
@@ -178,7 +178,7 @@ footer {
 <body>
 <header>
     <h1>🛡 Emergency Dashboard</h1>
-    <p id="who">Barangay Aisat</p>
+    <p id="who">Rosario, Cavite — Response Center</p>
     <button id="logoutBtn" type="button" hidden>Log out</button>
 </header>
 
@@ -250,8 +250,8 @@ footer {
 </main>
 
 <footer>
-    Barangay Aisat Emergency Dashboard<br>
-    For authorized barangay staff only.
+    Rosario Emergency Dashboard — student concept project<br>
+    For authorized response staff only.
 </footer>
 
 <script src="firebase-config.js"></script>
@@ -262,12 +262,14 @@ let currentTab = "all";
 let unsubscribe = null;
 let bannerTimer = null;
 
-const BASE_TITLE = "Emergency Dashboard — Barangay Aisat";
+const BASE_TITLE = "Emergency Dashboard — Rosario (Student Concept)";
 
 const ALERT_ICONS = {
+    MEDICAL: "🚑",
     FIRE: "🔥",
-    RIOT: "🛡",
-    SEXUAL: "🙅",
+    ACCIDENT: "🚗",
+    CRIME: "🚓",
+    FLOOD: "🌊",
     OTHER: "⚙️"
 };
 
@@ -519,7 +521,7 @@ function buildCard(r, queuePos) {
     }
     card.append(phoneRow);
 
-    card.append(row("Incident area", r.place));
+    card.append(row("Location", r.place));
     card.append(row("Radio channel", r.channel));
 
     const gps = el("div", "row");
@@ -632,7 +634,7 @@ Backend.onAuth(user => {
         startFeed();
     } else {
         stopFeed();
-        $("who").textContent = "Barangay Aisat";
+        $("who").textContent = "Rosario, Cavite — Response Center";
         $("logoutBtn").hidden = true;
         show("login");
     }
