@@ -96,8 +96,8 @@ function withTimeout(promise, ms, label) {
     const wait = add("wait", "6. Sending a TEST report to Firestore...");
     try {
         const ref = await withTimeout(fsMod.addDoc(fsMod.collection(db, "reports"), {
-            type: "OTHER",
-            label: "OTHER REPORT",
+            type: "MEDICAL",
+            label: "MEDICAL EMERGENCY",
             person: "DIAGNOSE TEST",
             phone: "0000000",
             place: "Test only - delete me",
@@ -114,7 +114,7 @@ function withTimeout(promise, ms, label) {
         let hint = "";
         const code = e && e.code;
         if (code === "permission-denied") {
-            hint = " -> The rules rejected it. Re-publish firestore.rules in Firebase > Firestore Database > Rules.";
+            hint = " -> The rules rejected it. Re-publish the rules in Firebase > Firestore Database > Rules.";
         } else if (code === "unavailable" || /did not answer/.test(e.message)) {
             hint = " -> Cannot reach Firestore. Check that the Firestore Database was created (Firebase > Firestore Database > Create database), and that no blocker is active.";
         } else if (code === "not-found") {
@@ -129,7 +129,7 @@ function withTimeout(promise, ms, label) {
         return;
     }
     if (!window.Backend) {
-        add("bad", "7. backend.js did not load or is broken (Backend is missing). Open /barangay-aisat/backend.js in your browser: it must show the code starting with (function () { and be 209 lines long. Re-upload it.");
+        add("bad", "7. backend.js did not load or is broken (Backend is missing). Open /rosario-emergency/backend.js in your browser: it must show the code starting with (function () { . Re-upload it if it does not.");
         return;
     }
     add("ok", "7. backend.js loaded. mode = " + window.Backend.mode);
